@@ -245,13 +245,13 @@
                   <input type="hidden" name="action" value="delete-message">
                 </form>
       <?php   }
-              $comment_query = "SELECT comments.id AS comment_id, users.id AS user_id, concat_ws(' ', users.first_name, users.last_name) AS name,
+              $comment_query = escape_this_string("SELECT comments.id AS comment_id, users.id AS user_id, concat_ws(' ', users.first_name, users.last_name) AS name,
                                 date_format(comments.created_at, '%M %D %Y | %I:%i %p') AS date,
                                 comments.comment FROM comments
                                 LEFT JOIN users ON users.id = comments.user_id
                                 LEFT JOIN messages ON messages.id = comments.message_id
                                 WHERE message_id = {$message_id}
-                                ORDER BY comments.created_at ASC";
+                                ORDER BY comments.created_at ASC");
               $comments = fetch_all($comment_query);
               // var_dump($comments);
               // die();
