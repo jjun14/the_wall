@@ -76,7 +76,8 @@ function register_user($post)
   {
     $errors[] = "Password and password confirmation don't match";
   } 
-  $query = escape_this_string("SELECT  * FROM users WHERE email = '{$post['email']}'");
+  $escape_email = escape_this_string($post['email']);
+  $query = "SELECT  * FROM users WHERE email = '{$escape_email}'";
   $emails = fetch_all($query);
   if(count($emails) > 0)
   {
@@ -91,12 +92,16 @@ function register_user($post)
   }
   else
   {
-    $query = escape_this_string("INSERT INTO users(first_name, last_name, email, password, created_at, updated_at)
-             VALUES ('{$post['first_name']}', '{$post['last_name']}',
-            '{$post['email']}', '{$post['password']}', NOW(), NOW())");
+    $escape_firstname = $post['first_name'];
+    $escape_lastname = $post['last_name'];
+    $escape_email = $post['email'];
+    $escape_password = $post['password'];
+    $query = "INSERT INTO users(first_name, last_name, email, password, created_at, updated_at)
+             VALUES ('{$escape_firstname}', '{$post['last_name']}',
+            '{$escape_email}', '{$escape_password}', NOW(), NOW())";
     run_mysql_query($query);
-    $user_info_query = escape_this_string("SELECT * FROM users WHERE users.email = '{$post['email']}'
-           AND users.password = '{$post['password']}'");
+    $user_info_query = "SELECT * FROM users WHERE users.email = '{$escape_email}'
+           AND users.password = '{$escape_password}'";
     $user = fetch_record($user_info_query);
     $_SESSION['success'] = "User created succesfully";
     $_SESSION['user_id'] = $user['id'];
@@ -110,9 +115,15 @@ function register_user($post)
 function login_user($post)
 {
   $errors = array();
-  $query = escape_this_string("SELECT * FROM users WHERE users.email = '{$post['email']}'
-           AND users.password = '{$post['password']}'");
+  $escape_email = escape_this_string($post['email']);
+  $escape_password = escape_this_string($post['password']);
+  $query = "SELECT * FROM users WHERE users.email = '{$escape_email}'
+           AND users.password = '{$escape_password}'";
+  // echo $query;
+  // die();
   $user = fetch_all($query);
+  // var_dump($user);
+  // die();
   ///-----------------start register validations---------------------///
   if(count($user) > 0)
   {
@@ -141,8 +152,10 @@ function post_message($post)
   }
   else
   {
-    $query = escape_this_string("INSERT INTO messages(user_id, message, created_at, updated_at)
-             VALUES({$_SESSION['user_id']}, '{$_POST['message']}', NOW(), NOW())");
+    $escape_userid = escape_this_string($_SESSION['user_id']);
+    $escape_post = escape_this_string($_POST['message']);
+    $query = "INSERT INTO messages(user_id, message, created_at, updated_at)
+             VALUES({$escape_userid}, '{$escape_post}', NOW(), NOW())";
     run_mysql_query($query);
     $_SESSION['success'] = "Successfully posted a message!";
     header("location: wall.php");
@@ -157,9 +170,12 @@ function post_message($post)
 
 function delete_message($post)
 {
-  $query = escape_this_string("DELETE FROM comments WHERE message_id = {$post['message_id']}");
+  $escape_messageid = escape_this_string($post['message_id']);
+  $query = "DELETE FROM comments WHERE message_id = {$escape_messageid}";
   run_mysql_query($query);
-  $query = escape_this_string("DELETE FROM messages WHERE user_id = {$_SESSION['user_id']} AND messages.id = {$_POST['message_id']}");
+  $escape_userid = $_SESSION['user_id'];
+  $escape_messageid = $_POST['message_id'];
+  $query = "DELETE FROM messages WHERE user_id = {$escape_userid} AND messages.id = {$escape_messageid}";
   run_mysql_query($query);
   header("location: wall.php");
   die();
@@ -172,8 +188,11 @@ function post_comment($post)
   {
     $errors[] = "Your comment can't be empty!";
   } else {
-    $query = escape_this_string("INSERT INTO comments(message_id, user_id, comment, created_at, updated_at)
-             VALUES('{$post['message_id']}',{$_SESSION['user_id']}, '{$post['comment']}', NOW(), NOW())");
+    $escape_messageid = $post['message_id'];
+    $escape_userid = $_SESSION['user_id'];
+    $escape_comment = $post['comment'];
+    $query = "INSERT INTO comments(message_id, user_id, comment, created_at, updated_at)
+             VALUES('{$escape_messageid}',{$escape_userid}, '{$escape_comment}', NOW(), NOW())";
     run_mysql_query($query);
     header("location: wall.php");
   }
@@ -186,7 +205,9 @@ function post_comment($post)
 
 function delete_comment($post)
 {
-  $query = escape_this_string("DELETE FROM comments WHERE id = {$post['comment_id']} AND user_id = {$_SESSION['user_id']}");
+  $escape_commentid = $post['comment_id'];
+  $escape_userid = $_SESSION['user_id'];
+  $query = "DELETE FROM comments WHERE id = {$escape_commentid} AND user_id = {$escape_userid}";
   run_mysql_query($query);
   header('location: wall.php');
   die();
