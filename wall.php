@@ -133,15 +133,32 @@
 
       #messages h5
       {
+        display: inline-block;
         font-weight: bold;
         font-size: 14px;
         margin-bottom: 15px;
       }
+
+      .delete-message
+      {
+        background-color: white;
+        width: 8px;
+        margin-bottom: 5px;
+      }
+
+      .delete-message input
+      {
+        display: inline-block;
+        background-color: white;
+        margin-left: 20px;
+        color: blue;
+        font-size: 9px;
+      }
       
-      .post {
+      .message {
         font-size: 12px;
-        margin-bottom: 20px;
-        display: block;
+        margin-bottom: 5px;
+        display: inline-block;
         width: 580px;
         padding-left: 20px;
       }
@@ -158,15 +175,29 @@
         margin-left: 30px;
       }
 
+      .delete-comment
+      {
+        background-color: white;
+        width: 8px;
+        margin-bottom: 5px;
+      }
+
+      .delete-comment input 
+      {
+        display: inline-block;
+        background-color: white;
+        margin: 0px 0px 10px 30px;
+        color: blue;
+        font-size: 9px;
+      }
+
       .comment {
         display: block;
         width: 500px;
-        margin: 5px 0px 10px 10px;
+        margin: 5px 0px 3px 10px;
         padding-left: 20px;
         font-size: 10px;
       }
-
-
     </style>
   </head>
   <body>
@@ -205,16 +236,16 @@
             {
               $message_id = intval($message["id"]);
               echo "<h5>{$message['name']} - {$message['date']}</h5>";
+              echo "<p class='message'>{$message['message']}</p>";
               if($_SESSION['user_id'] == $message['user_id'])
               { ?>
-                <form action="process.php" method="post">
-                  <input type="submit" name="submit" value="delete">
+                <form class="delete-message" action="process.php" method="post">
+                  <input type="submit" name="submit" value="(delete)">
                   <input type="hidden" name="message_id" value="<?= $message_id; ?>">
                   <input type="hidden" name="action" value="delete-message">
                 </form>
       <?php   }
-              echo "<p class='post'>{$message['message']}</p>";
-              $comment_query = "SELECT users.id, concat_ws(' ', users.first_name, users.last_name) AS name,
+              $comment_query = "SELECT comments.id AS comment_id, users.id AS user_id, concat_ws(' ', users.first_name, users.last_name) AS name,
                                 date_format(comments.created_at, '%M %D %Y | %I:%i %p') AS date,
                                 comments.comment FROM comments
                                 LEFT JOIN users ON users.id = comments.user_id
@@ -222,10 +253,22 @@
                                 WHERE message_id = {$message_id}
                                 ORDER BY comments.created_at ASC";
               $comments = fetch_all($comment_query);
+              // var_dump($comments);
+              // die();
               foreach($comments as $comment)
               {
                 echo "<h6>{$comment['name']} - {$comment['date']}</h5>";
+                // var_dump($_SESSION);
+                // var_dump($comment);
                 echo "<p class='comment'>{$comment['comment']}</p>";
+                if($_SESSION['user_id'] == $comment["user_id"])
+                { ?>
+                  <form class='delete-comment' action="process.php" method="post">
+                    <input type="submit" name="submit" value="(delete)">
+                    <input type="hidden" name="comment_id" value="<?= $comment["comment_id"]; ?>">
+                    <input type="hidden" name="action" value="delete-comment">
+                  </form>
+      <?php     }
               }
             ?>
         <form id="comment-form" class="comment-form" action="process.php" method="post">
