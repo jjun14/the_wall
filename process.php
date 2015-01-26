@@ -2,7 +2,7 @@
 
 session_start();
 
-require('new_connection2.php');
+require('new_connection.php');
 
 // var_dump($_POST);
 

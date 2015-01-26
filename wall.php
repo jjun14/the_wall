@@ -2,7 +2,7 @@
 
  session_start();
 
- require('new_connection2.php');
+ require('new_connection.php');
  $messages_query = "SELECT messages.id, concat_ws(' ', first_name, last_name) AS name,
                     date_format(messages.created_at, '%M %D %Y | %I:%i %p') AS date,
                     message FROM messages 
