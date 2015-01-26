@@ -4,23 +4,25 @@ session_start();
 
 require('new_connection.php');
 
-// var_dump($_POST);
-
 if(isset($_POST['action']) && $_POST['action'] == "register")
 {
   register_user($_POST);
 }
-else if (isset($_POST['action']) && $_POST['action'] == "login")
+else if(isset($_POST['action']) && $_POST['action'] == "login")
 {
   login_user($_POST);
 }
-else if (isset($_POST['action']) && $_POST['action'] == "post")
+else if(isset($_POST['action']) && $_POST['action'] == "post")
 {
   post_message($_POST);
 }
-else if (isset($_POST['action']) && $_POST['action'] == "comment")
+else if(isset($_POST['action']) && $_POST['action'] == "comment")
 {
   post_comment($_POST);
+}
+else if(isset($_POST['action']) && $_POST['action'] == "delete-message")
+{
+  delete_message($_POST);
 }
 else 
 {
@@ -147,6 +149,21 @@ function post_message($post)
     header("location: wall.php");
     die();
   }
+}
+
+function delete_message($post)
+{
+  // echo "POST INFO";
+  // var_dump($_POST);
+  // echo "SESSION INFO";
+  // var_dump($_SESSION);
+  // die();
+  $query = "DELETE FROM comments WHERE message_id = {$post['message_id']}";
+  run_mysql_query($query);
+  $query = "DELETE FROM messages WHERE user_id = {$_SESSION['user_id']} AND messages.id = {$_POST['message_id']}";
+  run_mysql_query($query);
+  header("location: wall.php");
+  die();
 }
 
 function post_comment($post)

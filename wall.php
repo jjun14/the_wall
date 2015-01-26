@@ -3,7 +3,7 @@
  session_start();
 
  require('new_connection.php');
- $messages_query = "SELECT messages.id, concat_ws(' ', first_name, last_name) AS name,
+ $messages_query = "SELECT user_id, messages.id, concat_ws(' ', first_name, last_name) AS name,
                     date_format(messages.created_at, '%M %D %Y | %I:%i %p') AS date,
                     message FROM messages 
                     JOIN users ON users.id = messages.user_id 
@@ -199,12 +199,22 @@
       </form>
       <div id="messages">
       <?php 
+            // var_dump($messages);
+            // var_dump($_SESSION);
             foreach ($messages as $message)
             {
               $message_id = intval($message["id"]);
               echo "<h5>{$message['name']} - {$message['date']}</h5>";
+              if($_SESSION['user_id'] == $message['user_id'])
+              { ?>
+                <form action="process.php" method="post">
+                  <input type="submit" name="submit" value="delete">
+                  <input type="hidden" name="message_id" value="<?= $message_id; ?>">
+                  <input type="hidden" name="action" value="delete-message">
+                </form>
+      <?php   }
               echo "<p class='post'>{$message['message']}</p>";
-              $comment_query = "SELECT concat_ws(' ', users.first_name, users.last_name) AS name,
+              $comment_query = "SELECT users.id, concat_ws(' ', users.first_name, users.last_name) AS name,
                                 date_format(comments.created_at, '%M %D %Y | %I:%i %p') AS date,
                                 comments.comment FROM comments
                                 LEFT JOIN users ON users.id = comments.user_id
