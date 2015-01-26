@@ -3,11 +3,11 @@
  session_start();
 
  require('new_connection.php');
- $messages_query = "SELECT user_id, messages.id, concat_ws(' ', first_name, last_name) AS name,
+ $messages_query = escape_this_string("SELECT user_id, messages.id, concat_ws(' ', first_name, last_name) AS name,
                     date_format(messages.created_at, '%M %D %Y | %I:%i %p') AS date,
                     message FROM messages 
                     JOIN users ON users.id = messages.user_id 
-                    ORDER BY messages.created_at DESC";
+                    ORDER BY messages.created_at DESC");
  // echo $messages_query;
  // die();
  $messages = fetch_all($messages_query);
